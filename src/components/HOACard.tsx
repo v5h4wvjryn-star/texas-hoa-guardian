@@ -1,5 +1,7 @@
-import { Mail, Save, Building2, AlertTriangle, CheckCircle, Clock, Target, Globe } from "lucide-react";
+import { useState } from "react";
+import { Mail, Save, Building2, AlertTriangle, CheckCircle, Clock, Target, Globe, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { HOAData } from "@/pages/Index";
 import { scoreCompliance, type RiskLevel } from "@/lib/compliance";
 
