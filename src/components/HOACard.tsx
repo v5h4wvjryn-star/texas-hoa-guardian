@@ -122,9 +122,19 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
           )}
         </p>
         {hasCertificate && (
-          <a href={hoa.certificate!.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline underline-offset-2">
-            View Certificate
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href={`https://www.hoa.texas.gov/management-certificates-search?combine=${encodeURIComponent(hoa.name || "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-primary underline underline-offset-2"
+            >
+              View Profile
+            </a>
+            <a href={hoa.certificate!.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline underline-offset-2">
+              View Certificate
+            </a>
+          </div>
         )}
       </div>
 
