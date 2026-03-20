@@ -54,7 +54,7 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
   if (!hasWebsite) issues.push("no website (§207.006)");
   if (!hasEmail) issues.push("no contact email (SB 711)");
 
-  if (!hasCert || (!hasWebsite && !hasEmail)) {
+  if (!hasCert) {
     riskLevel = "high";
     riskLabel = "High Risk";
     riskDescription = issues.join(", ").replace(/^./, (c) => c.toUpperCase());
@@ -73,7 +73,7 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
   } else {
     riskLevel = "compliant";
     riskLabel = "Compliant";
-    riskDescription = "Certificate, website, and email all on file";
+    riskDescription = "Certificate on file — website and email present";
   }
 
   // --- Legality Check ---
