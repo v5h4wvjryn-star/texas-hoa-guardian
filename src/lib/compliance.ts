@@ -8,6 +8,7 @@ export interface ComplianceResult {
   riskDescription: string;
   legalityFlag: string | null;
   filingYear: number | null;
+  complianceDetails: string;
 }
 
 /** Extract a 4-digit year from the certificate URL filename */
