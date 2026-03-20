@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Search, Scale, BookOpen } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Search, Scale, BookOpen, AlertTriangle, Target, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import HOACard from "@/components/HOACard";
 import OutreachModal from "@/components/OutreachModal";
 import LeadsView from "@/components/LeadsView";
-
+import { scoreCompliance } from "@/lib/compliance";
 const API_URL = "https://data.texas.gov/resource/8auc-hzdi.json";
 
 export interface HOAData {
