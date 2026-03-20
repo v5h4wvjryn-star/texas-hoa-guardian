@@ -59,9 +59,14 @@ export default function Index() {
     toast.success("Lead saved");
   };
 
-  const nonCompliantCount = results.filter(
-    (h) => !h.certificate?.url || h.certificate.url.trim() === ""
-  ).length;
+  const riskCounts = results.reduce(
+    (acc, h) => {
+      const { riskLevel } = scoreCompliance(h);
+      acc[riskLevel] = (acc[riskLevel] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return (
     <div className="min-h-screen bg-background">
