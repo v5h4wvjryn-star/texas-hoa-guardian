@@ -10,12 +10,16 @@ import LeadsView from "@/components/LeadsView";
 
 const API_URL = "https://data.texas.gov/resource/8auc-hzdi.json";
 
-interface HOAData {
-  filing_entity_name?: string;
+export interface HOAData {
+  name?: string;
+  county?: string;
+  city?: string;
+  zip?: string;
+  type?: string;
+  certificate?: { url?: string };
   management_company_name?: string;
   management_company_email?: string;
   website_address?: string;
-  city?: string;
 }
 
 type Tab = "search" | "leads";
