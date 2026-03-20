@@ -48,11 +48,13 @@ export default function Index() {
   }, [city]);
 
   const saveLead = async (hoa: HOAData) => {
+    const compliance = scoreCompliance(hoa);
     const { error } = await supabase.from("hoa_leads").insert({
       hoa_name: hoa.name || null,
       mgmt_company: hoa.management_company_name || null,
       contact_email: hoa.management_company_email || null,
       city: hoa.city || null,
+      compliance_details: compliance.complianceDetails,
     });
     if (error) { toast.error("Failed to save lead"); return; }
     setSavedNames((prev) => new Set(prev).add(hoa.name || ""));
