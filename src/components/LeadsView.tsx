@@ -116,7 +116,7 @@ export default function LeadsView({ onLeadDeleted }: LeadsViewProps) {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    const query = encodeURIComponent(`${lead.hoa_name || ""} contact email`);
+                    const query = encodeURIComponent(`${lead.hoa_name || ""} +contact +email`);
                     window.open(`https://www.google.com/search?q=${query}`, "_blank");
                   }}
                   title="Search for contact info"
