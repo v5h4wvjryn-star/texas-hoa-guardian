@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           city: string | null
           compliance_details: string | null
+          compliance_howto: string | null
           contact_email: string | null
           created_at: string
           hoa_name: string | null
@@ -28,6 +29,7 @@ export type Database = {
         Insert: {
           city?: string | null
           compliance_details?: string | null
+          compliance_howto?: string | null
           contact_email?: string | null
           created_at?: string
           hoa_name?: string | null
@@ -38,6 +40,7 @@ export type Database = {
         Update: {
           city?: string | null
           compliance_details?: string | null
+          compliance_howto?: string | null
           contact_email?: string | null
           created_at?: string
           hoa_name?: string | null

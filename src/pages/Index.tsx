@@ -55,6 +55,7 @@ export default function Index() {
       contact_email: hoa.management_company_email || null,
       city: hoa.city || null,
       compliance_details: compliance.complianceDetails,
+      compliance_howto: compliance.complianceHowTo,
     });
     if (error) { toast.error("Failed to save lead"); return; }
     setSavedNames((prev) => new Set(prev).add(hoa.name || ""));

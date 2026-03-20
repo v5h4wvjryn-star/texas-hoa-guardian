@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Mail, ChevronDown, ChevronUp, ClipboardList } from "lucide-react";
+import { Trash2, Mail, ChevronDown, ChevronUp, ClipboardList, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import OutreachModal from "./OutreachModal";
@@ -14,6 +14,7 @@ interface Lead {
   status: string | null;
   created_at: string;
   compliance_details: string | null;
+  compliance_howto: string | null;
 }
 
 export default function LeadsView() {
@@ -118,17 +119,48 @@ export default function LeadsView() {
               </div>
             </div>
 
-            {expandedId === lead.id && lead.compliance_details && (
-              <div className="border-t border-border bg-muted/40 px-4 py-3">
-                <p className="text-xs font-medium text-card-foreground mb-2 flex items-center gap-1.5">
-                  <ClipboardList className="h-3.5 w-3.5 text-primary" />
-                  Compliance Action Items
-                </p>
-                <div className="space-y-1">
-                  {lead.compliance_details.split("\n").map((line, idx) => (
-                    <p key={idx} className="text-xs text-muted-foreground leading-relaxed">{line}</p>
-                  ))}
-                </div>
+            {expandedId === lead.id && (lead.compliance_details || lead.compliance_howto) && (
+              <div className="border-t border-border bg-muted/40 px-4 py-3 space-y-4">
+                {lead.compliance_details && (
+                  <div>
+                    <p className="text-xs font-medium text-card-foreground mb-2 flex items-center gap-1.5">
+                      <ClipboardList className="h-3.5 w-3.5 text-primary" />
+                      Compliance Action Items
+                    </p>
+                    <div className="space-y-1">
+                      {lead.compliance_details.split("\n").map((line, idx) => (
+                        <p key={idx} className="text-xs text-muted-foreground leading-relaxed">{line}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {lead.compliance_howto && (
+                  <div className="border-t border-border pt-3">
+                    <p className="text-xs font-semibold text-card-foreground mb-2 flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 text-primary" />
+                      How-To Instructions
+                    </p>
+                    <div className="space-y-0.5">
+                      {lead.compliance_howto.split("\n").map((line, idx) => {
+                        const isHeader = line === line.toUpperCase() && line.includes(":");
+                        return line.trim() === "" ? (
+                          <div key={idx} className="h-2" />
+                        ) : (
+                          <p
+                            key={idx}
+                            className={`text-xs leading-relaxed ${
+                              isHeader
+                                ? "font-semibold text-card-foreground mt-2"
+                                : "text-muted-foreground pl-1"
+                            }`}
+                          >
+                            {line}
+                          </p>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
