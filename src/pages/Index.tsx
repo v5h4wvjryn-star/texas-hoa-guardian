@@ -81,6 +81,14 @@ export default function Index() {
     {} as Record<string, number>
   );
 
+  const riskOrder: Record<string, number> = { high: 0, opportunity: 1, medium: 2, compliant: 3 };
+
+  const sortedResults = [...results].sort((a, b) => {
+    const ra = riskOrder[scoreCompliance(a).riskLevel] ?? 2;
+    const rb = riskOrder[scoreCompliance(b).riskLevel] ?? 2;
+    return ra - rb;
+  });
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -162,12 +170,17 @@ export default function Index() {
                     <Target className="h-3 w-3" /> {riskCounts.opportunity} Opportunity
                   </span>
                 )}
+                {riskCounts.compliant > 0 && (
+                  <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                    {riskCounts.compliant} Compliant
+                  </span>
+                )}
               </div>
             )}
 
             {/* Results Grid */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((hoa, i) => (
+              {sortedResults.map((hoa, i) => (
                 <HOACard
                   key={`${hoa.name}-${i}`}
                   hoa={hoa}
