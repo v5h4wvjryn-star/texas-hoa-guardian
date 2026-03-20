@@ -14,7 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      hoa_leads: {
+        Row: {
+          city: string | null
+          contact_email: string | null
+          created_at: string
+          hoa_name: string | null
+          id: string
+          mgmt_company: string | null
+          status: string | null
+        }
+        Insert: {
+          city?: string | null
+          contact_email?: string | null
+          created_at?: string
+          hoa_name?: string | null
+          id?: string
+          mgmt_company?: string | null
+          status?: string | null
+        }
+        Update: {
+          city?: string | null
+          contact_email?: string | null
+          created_at?: string
+          hoa_name?: string | null
+          id?: string
+          mgmt_company?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
