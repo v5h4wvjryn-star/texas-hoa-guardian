@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Mail, ChevronDown, ChevronUp, ClipboardList, BookOpen } from "lucide-react";
+import { Trash2, Mail, ChevronDown, ChevronUp, ClipboardList, BookOpen, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import OutreachModal from "./OutreachModal";
@@ -112,6 +112,17 @@ export default function LeadsView({ onLeadDeleted }: LeadsViewProps) {
                     {expandedId === lead.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                   </Button>
                 )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    const query = encodeURIComponent(`${lead.hoa_name || ""} contact email`);
+                    window.open(`https://www.google.com/search?q=${query}`, "_blank");
+                  }}
+                  title="Search for contact info"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Button>
                 <Button
                   size="sm"
                   variant="ghost"
