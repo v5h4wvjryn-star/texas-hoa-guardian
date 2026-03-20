@@ -14,6 +14,7 @@ interface Lead {
   status: string | null;
   created_at: string;
   compliance_details: string | null;
+  compliance_howto: string | null;
 }
 
 export default function LeadsView() {
