@@ -17,7 +17,11 @@ interface Lead {
   compliance_howto: string | null;
 }
 
-export default function LeadsView() {
+interface LeadsViewProps {
+  onLeadDeleted?: (hoaName: string) => void;
+}
+
+export default function LeadsView({ onLeadDeleted }: LeadsViewProps) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [outreach, setOutreach] = useState<{ name: string; email: string } | null>(null);
@@ -40,8 +44,10 @@ export default function LeadsView() {
     const { error } = await supabase.from("hoa_leads").delete().eq("id", id);
     if (error) toast.error("Failed to remove lead");
     else {
+      const lead = leads.find((l) => l.id === id);
       setLeads((prev) => prev.filter((l) => l.id !== id));
       toast.success("Lead removed");
+      if (lead?.hoa_name && onLeadDeleted) onLeadDeleted(lead.hoa_name);
     }
   };
 
