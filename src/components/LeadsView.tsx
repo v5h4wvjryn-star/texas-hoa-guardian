@@ -115,6 +115,17 @@ export default function LeadsView({ onLeadDeleted }: LeadsViewProps) {
                 <Button
                   size="sm"
                   variant="ghost"
+                  onClick={() => {
+                    const query = encodeURIComponent(`${lead.hoa_name || ""} contact email`);
+                    window.open(`https://www.google.com/search?q=${query}`, "_blank");
+                  }}
+                  title="Search for contact info"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
                   onClick={() => setOutreach({ name: lead.hoa_name || "HOA", email: lead.contact_email || "" })}
                 >
                   <Mail className="h-3.5 w-3.5" />
