@@ -132,9 +132,24 @@ export default function Index() {
 
             {/* Stats */}
             {results.length > 0 && (
-              <p className="text-xs text-muted-foreground mb-4">
-                {results.length} results · <span className="text-destructive font-medium">{nonCompliantCount} non-compliant</span>
-              </p>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
+                <span>{results.length} results</span>
+                {riskCounts.high > 0 && (
+                  <span className="inline-flex items-center gap-1 text-destructive font-medium">
+                    <AlertTriangle className="h-3 w-3" /> {riskCounts.high} High Risk
+                  </span>
+                )}
+                {riskCounts.medium > 0 && (
+                  <span className="inline-flex items-center gap-1 font-medium" style={{ color: "hsl(38 92% 50%)" }}>
+                    <Clock className="h-3 w-3" /> {riskCounts.medium} Medium
+                  </span>
+                )}
+                {riskCounts.opportunity > 0 && (
+                  <span className="inline-flex items-center gap-1 font-medium" style={{ color: "hsl(24 90% 45%)" }}>
+                    <Target className="h-3 w-3" /> {riskCounts.opportunity} Opportunity
+                  </span>
+                )}
+              </div>
             )}
 
             {/* Results Grid */}
