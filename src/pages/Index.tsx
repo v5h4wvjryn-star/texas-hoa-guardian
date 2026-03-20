@@ -171,7 +171,7 @@ export default function Index() {
                   </span>
                 )}
                 {riskCounts.compliant > 0 && (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                  <span className="inline-flex items-center gap-1 text-success font-medium">
                     {riskCounts.compliant} Compliant
                   </span>
                 )}
