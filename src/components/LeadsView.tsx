@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Mail, ChevronDown, ChevronUp, ClipboardList, BookOpen } from "lucide-react";
+import { Trash2, Mail, ChevronDown, ChevronUp, ClipboardList, BookOpen, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import OutreachModal from "./OutreachModal";
