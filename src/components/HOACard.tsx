@@ -1,5 +1,7 @@
-import { Mail, Save, Building2, AlertTriangle, CheckCircle, Clock, Target, Globe } from "lucide-react";
+import { useState } from "react";
+import { Mail, Save, Building2, AlertTriangle, CheckCircle, Clock, Target, Globe, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { HOAData } from "@/pages/Index";
 import { scoreCompliance, type RiskLevel } from "@/lib/compliance";
 
@@ -35,10 +37,27 @@ const riskConfig: Record<RiskLevel, { icon: typeof AlertTriangle; badgeClass: st
 };
 
 export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, index }: HOACardProps) {
+  const [manualEmail, setManualEmail] = useState("");
+  const [showEmailInput, setShowEmailInput] = useState(false);
   const compliance = scoreCompliance(hoa);
   const config = riskConfig[compliance.riskLevel];
   const Icon = config.icon;
   const hasCertificate = !!hoa.certificate?.url && hoa.certificate.url.trim() !== "";
+  const effectiveEmail = manualEmail.trim() || hoa.management_company_email || "";
+
+  const handleSave = () => {
+    const hoaWithEmail = effectiveEmail && effectiveEmail !== hoa.management_company_email
+      ? { ...hoa, management_company_email: effectiveEmail }
+      : hoa;
+    onSaveLead(hoaWithEmail);
+  };
+
+  const handleOutreach = () => {
+    const hoaWithEmail = effectiveEmail && effectiveEmail !== hoa.management_company_email
+      ? { ...hoa, management_company_email: effectiveEmail }
+      : hoa;
+    onGenerateOutreach(hoaWithEmail);
+  };
 
   return (
     <div
@@ -87,15 +106,40 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
         {hoa.management_company_name && (
           <p><span className="font-medium text-card-foreground">Mgmt Co:</span> {hoa.management_company_name}</p>
         )}
-        {hoa.management_company_email && (
-          <p><span className="font-medium text-card-foreground">Email:</span> {hoa.management_company_email}</p>
-        )}
+        <p className="flex items-center gap-1">
+          <Mail className="h-3 w-3 shrink-0" />
+          <span className="font-medium text-card-foreground">Email:</span>{" "}
+          {hoa.management_company_email ? (
+            <span>{hoa.management_company_email}</span>
+          ) : (
+            <button
+              onClick={() => setShowEmailInput(!showEmailInput)}
+              className="text-destructive font-medium underline underline-offset-2 inline-flex items-center gap-1 hover:text-destructive/80 transition-colors"
+            >
+              <PenLine className="h-3 w-3" />
+              Missing — add manually
+            </button>
+          )}
+        </p>
         {hasCertificate && (
           <a href={hoa.certificate!.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline underline-offset-2">
             View Certificate
           </a>
         )}
       </div>
+
+      {/* Manual Email Input */}
+      {showEmailInput && !hoa.management_company_email && (
+        <div className="mb-3">
+          <Input
+            type="email"
+            placeholder="Enter contact email…"
+            value={manualEmail}
+            onChange={(e) => setManualEmail(e.target.value)}
+            className="text-xs h-8"
+          />
+        </div>
+      )}
 
       {/* Legality Check */}
       {compliance.legalityFlag && (
@@ -113,7 +157,7 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
           size="sm"
           variant={isSaved ? "secondary" : "default"}
           disabled={isSaved}
-          onClick={() => onSaveLead(hoa)}
+          onClick={handleSave}
           className="text-xs"
         >
           <Save className="h-3 w-3 mr-1" />
@@ -123,7 +167,7 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
           <Button
             size="sm"
             variant="outline"
-            onClick={() => onGenerateOutreach(hoa)}
+            onClick={handleOutreach}
             className="text-xs"
           >
             <Mail className="h-3 w-3 mr-1" />
