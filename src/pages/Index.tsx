@@ -32,6 +32,16 @@ export default function Index() {
   const [tab, setTab] = useState<Tab>("search");
   const [outreach, setOutreach] = useState<{ name: string; email: string } | null>(null);
 
+  // Load saved lead names from DB on mount
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("hoa_leads").select("hoa_name");
+      if (data) {
+        setSavedNames(new Set(data.map((r) => r.hoa_name || "")));
+      }
+    })();
+  }, []);
+
   const search = useCallback(async () => {
     if (!city.trim()) { toast.error("Enter a city to search"); return; }
     setLoading(true);
