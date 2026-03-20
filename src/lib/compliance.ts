@@ -75,32 +75,81 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
 
   // --- Actionable Compliance Instructions ---
   const steps: string[] = [];
+  const howTo: string[] = [];
 
   if (!hasCert) {
     steps.push("1. File a Certificate of Formation or Registration with the Texas Secretary of State per TX Property Code §207.006.");
     steps.push("2. Submit the Legacy Filing before the March 1, 2026 deadline to avoid penalties.");
     steps.push("3. Ensure the HOA's management certificate is uploaded to the TREC portal.");
+
+    howTo.push("HOW TO FILE A CERTIFICATE OF FORMATION:");
+    howTo.push("• Go to the Texas Secretary of State website: https://www.sos.state.tx.us");
+    howTo.push("• Navigate to 'Business & Nonprofits' → 'Filing with the Secretary of State'");
+    howTo.push("• Select 'Nonprofit Corporation' or 'Unincorporated Nonprofit Association' depending on your HOA structure");
+    howTo.push("• Complete Form 202 (Certificate of Formation) — you'll need the HOA's legal name, registered agent info, and purpose statement");
+    howTo.push("• Filing fee is $25 online or by mail");
+    howTo.push("");
+    howTo.push("HOW TO SUBMIT THE LEGACY FILING:");
+    howTo.push("• Visit the TREC (Texas Real Estate Commission) portal at https://www.trec.texas.gov");
+    howTo.push("• Log in or create an account for the HOA");
+    howTo.push("• Navigate to 'HOA Registration' and select 'Legacy Filing'");
+    howTo.push("• Upload the Certificate of Formation, current bylaws, and most recent financial statement");
+    howTo.push("• Provide the HOA's physical address, mailing address, and management company details");
+    howTo.push("• Submit before March 1, 2026 — late filings may result in inability to enforce deed restrictions");
   }
 
   if (filingYear !== null && filingYear < 2025) {
     steps.push(`${steps.length + 1}. Current filing is from ${filingYear} — re-file an updated certificate before March 1, 2026.`);
     steps.push(`${steps.length + 1}. Verify all management company details are current in the new filing.`);
+
+    howTo.push("");
+    howTo.push("HOW TO RE-FILE / UPDATE AN EXISTING CERTIFICATE:");
+    howTo.push("• Log in to the TREC portal at https://www.trec.texas.gov");
+    howTo.push("• Search for the existing HOA filing using the HOA name or certificate number");
+    howTo.push("• Select 'Amend' or 'Renew' — you cannot simply re-submit; you must reference the prior filing");
+    howTo.push("• Update all fields: management company name, address, phone, and email");
+    howTo.push("• Upload any new or amended governing documents (bylaws, declarations)");
+    howTo.push("• Confirm the registered agent information is current with the Secretary of State");
+    howTo.push("• Submit and retain the confirmation number for your records");
   }
 
   if (!hoa.management_company_email) {
     steps.push(`${steps.length + 1}. Add a valid management company email to the TREC filing for SB 711 compliance.`);
+
+    howTo.push("");
+    howTo.push("HOW TO ADD A MANAGEMENT COMPANY EMAIL:");
+    howTo.push("• SB 711 requires HOAs to provide a publicly accessible contact email for the management company");
+    howTo.push("• Log in to the TREC portal and locate the HOA's filing");
+    howTo.push("• Edit the 'Management Company Information' section");
+    howTo.push("• Enter a monitored email address (not a no-reply) — this will be publicly visible");
+    howTo.push("• If the HOA is self-managed, use the board president's email or create a dedicated HOA email (e.g., board@yourhoa.org)");
+    howTo.push("• Save and confirm the update");
   }
 
   if (isSelfManaged(name)) {
     steps.push(`${steps.length + 1}. Self-managed HOA — consider engaging a professional management company or building a dedicated community website for transparency.`);
     steps.push(`${steps.length + 1}. Ensure all required documents (bylaws, financials) are publicly accessible per SB 711.`);
+
+    howTo.push("");
+    howTo.push("HOW TO BRING A SELF-MANAGED HOA INTO COMPLIANCE:");
+    howTo.push("• Option A — Hire a Management Company: Request proposals from licensed Texas community association managers. They handle filings, financials, and compliance on your behalf.");
+    howTo.push("• Option B — Build a Community Website: Create a site that hosts required documents (bylaws, meeting minutes, financials, insurance certificates). This satisfies SB 711 transparency requirements.");
+    howTo.push("• Required public documents under SB 711: dedicatory instruments, bylaws, rules, current budget, most recent financial audit or review, insurance certificates");
+    howTo.push("• Post meeting notices at least 72 hours in advance on the website and at a physical location in the community");
+    howTo.push("• Maintain a current resident directory (opt-in) and provide an online portal for dues payment if possible");
   }
 
   if (steps.length === 0) {
     steps.push("This HOA appears compliant. Monitor for annual renewal requirements.");
+    howTo.push("ONGOING COMPLIANCE CHECKLIST:");
+    howTo.push("• Verify your TREC filing annually — certificates may need renewal depending on your filing date");
+    howTo.push("• Keep management company contact info updated within 30 days of any change");
+    howTo.push("• Ensure all governing documents remain publicly accessible per SB 711");
+    howTo.push("• File any amendments to bylaws or declarations with the county clerk within 30 days");
   }
 
   const complianceDetails = steps.join("\n");
+  const complianceHowTo = howTo.join("\n");
 
-  return { riskLevel, riskLabel, riskDescription, legalityFlag, filingYear, complianceDetails };
+  return { riskLevel, riskLabel, riskDescription, legalityFlag, filingYear, complianceDetails, complianceHowTo };
 }
