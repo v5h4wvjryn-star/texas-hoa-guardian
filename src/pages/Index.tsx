@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Search, Scale, BookOpen } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Search, Scale, BookOpen, AlertTriangle, Target, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import HOACard from "@/components/HOACard";
 import OutreachModal from "@/components/OutreachModal";
 import LeadsView from "@/components/LeadsView";
-
+import { scoreCompliance } from "@/lib/compliance";
 const API_URL = "https://data.texas.gov/resource/8auc-hzdi.json";
 
 export interface HOAData {
@@ -59,9 +59,14 @@ export default function Index() {
     toast.success("Lead saved");
   };
 
-  const nonCompliantCount = results.filter(
-    (h) => !h.certificate?.url || h.certificate.url.trim() === ""
-  ).length;
+  const riskCounts = results.reduce(
+    (acc, h) => {
+      const { riskLevel } = scoreCompliance(h);
+      acc[riskLevel] = (acc[riskLevel] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,9 +132,24 @@ export default function Index() {
 
             {/* Stats */}
             {results.length > 0 && (
-              <p className="text-xs text-muted-foreground mb-4">
-                {results.length} results · <span className="text-destructive font-medium">{nonCompliantCount} non-compliant</span>
-              </p>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
+                <span>{results.length} results</span>
+                {riskCounts.high > 0 && (
+                  <span className="inline-flex items-center gap-1 text-destructive font-medium">
+                    <AlertTriangle className="h-3 w-3" /> {riskCounts.high} High Risk
+                  </span>
+                )}
+                {riskCounts.medium > 0 && (
+                  <span className="inline-flex items-center gap-1 font-medium" style={{ color: "hsl(38 92% 50%)" }}>
+                    <Clock className="h-3 w-3" /> {riskCounts.medium} Medium
+                  </span>
+                )}
+                {riskCounts.opportunity > 0 && (
+                  <span className="inline-flex items-center gap-1 font-medium" style={{ color: "hsl(24 90% 45%)" }}>
+                    <Target className="h-3 w-3" /> {riskCounts.opportunity} Opportunity
+                  </span>
+                )}
+              </div>
             )}
 
             {/* Results Grid */}
