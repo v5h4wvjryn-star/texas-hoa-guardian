@@ -41,16 +41,23 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
   const hasCert = certUrl.length > 0;
   const name = hoa.name || "";
   const filingYear = hasCert ? extractYearFromUrl(certUrl) : null;
+  const hasWebsite = !!hoa.website_address?.trim();
+  const hasEmail = !!hoa.management_company_email?.trim();
 
-  // --- Risk Level ---
+  // --- Risk Level (worst issue wins) ---
   let riskLevel: RiskLevel;
   let riskLabel: string;
   let riskDescription: string;
 
-  if (!hasCert) {
+  const issues: string[] = [];
+  if (!hasCert) issues.push("no TREC certificate");
+  if (!hasWebsite) issues.push("no website (§207.006)");
+  if (!hasEmail) issues.push("no contact email (SB 711)");
+
+  if (!hasCert || (!hasWebsite && !hasEmail)) {
     riskLevel = "high";
     riskLabel = "High Risk";
-    riskDescription = "No certificate on file — potential §207.006 violation";
+    riskDescription = issues.join(", ").replace(/^./, (c) => c.toUpperCase());
   } else if (isSelfManaged(name)) {
     riskLevel = "opportunity";
     riskLabel = "Opportunity";
@@ -59,10 +66,14 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
     riskLevel = "medium";
     riskLabel = "Medium Risk";
     riskDescription = `Certificate dated ${filingYear} — may need renewal`;
+  } else if (!hasWebsite || !hasEmail) {
+    riskLevel = "medium";
+    riskLabel = "Medium Risk";
+    riskDescription = issues.join(", ").replace(/^./, (c) => c.toUpperCase());
   } else {
     riskLevel = "compliant";
     riskLabel = "Compliant";
-    riskDescription = "Certificate on file and appears current";
+    riskDescription = "Certificate, website, and email all on file";
   }
 
   // --- Legality Check ---
