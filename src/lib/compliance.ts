@@ -72,5 +72,34 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
     legalityFlag = `Outdated Filing (${filingYear}) — must re-file before March 1, 2026`;
   }
 
-  return { riskLevel, riskLabel, riskDescription, legalityFlag, filingYear };
+  // --- Actionable Compliance Instructions ---
+  const steps: string[] = [];
+
+  if (!hasCert) {
+    steps.push("1. File a Certificate of Formation or Registration with the Texas Secretary of State per TX Property Code §207.006.");
+    steps.push("2. Submit the Legacy Filing before the March 1, 2026 deadline to avoid penalties.");
+    steps.push("3. Ensure the HOA's management certificate is uploaded to the TREC portal.");
+  }
+
+  if (filingYear !== null && filingYear < 2025) {
+    steps.push(`${steps.length + 1}. Current filing is from ${filingYear} — re-file an updated certificate before March 1, 2026.`);
+    steps.push(`${steps.length + 1}. Verify all management company details are current in the new filing.`);
+  }
+
+  if (!hoa.management_company_email) {
+    steps.push(`${steps.length + 1}. Add a valid management company email to the TREC filing for SB 711 compliance.`);
+  }
+
+  if (isSelfManaged(name)) {
+    steps.push(`${steps.length + 1}. Self-managed HOA — consider engaging a professional management company or building a dedicated community website for transparency.`);
+    steps.push(`${steps.length + 1}. Ensure all required documents (bylaws, financials) are publicly accessible per SB 711.`);
+  }
+
+  if (steps.length === 0) {
+    steps.push("This HOA appears compliant. Monitor for annual renewal requirements.");
+  }
+
+  const complianceDetails = steps.join("\n");
+
+  return { riskLevel, riskLabel, riskDescription, legalityFlag, filingYear, complianceDetails };
 }
