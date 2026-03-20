@@ -1,16 +1,165 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect, useCallback } from "react";
+import { Search, Scale, BookOpen } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import HOACard from "@/components/HOACard";
+import OutreachModal from "@/components/OutreachModal";
+import LeadsView from "@/components/LeadsView";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const API_URL = "https://data.texas.gov/resource/8auc-hzdi.json";
+
+interface HOAData {
+  filing_entity_name?: string;
+  management_company_name?: string;
+  management_company_email?: string;
+  website_address?: string;
+  city?: string;
+}
+
+type Tab = "search" | "leads";
+
+export default function Index() {
+  const [city, setCity] = useState("");
+  const [results, setResults] = useState<HOAData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [savedNames, setSavedNames] = useState<Set<string>>(new Set());
+  const [tab, setTab] = useState<Tab>("search");
+  const [outreach, setOutreach] = useState<{ name: string; email: string } | null>(null);
+
+  const search = useCallback(async () => {
+    if (!city.trim()) { toast.error("Enter a city to search"); return; }
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}?$where=upper(city)='${city.trim().toUpperCase()}'&$limit=100`);
+      if (!res.ok) throw new Error("API error");
+      const data: HOAData[] = await res.json();
+      setResults(data);
+      if (data.length === 0) toast("No HOAs found for that city");
+    } catch {
+      toast.error("Failed to fetch data from Texas Data Portal");
+    }
+    setLoading(false);
+  }, [city]);
+
+  const saveLead = async (hoa: HOAData) => {
+    const { error } = await supabase.from("hoa_leads").insert({
+      hoa_name: hoa.filing_entity_name || null,
+      mgmt_company: hoa.management_company_name || null,
+      contact_email: hoa.management_company_email || null,
+      city: hoa.city || null,
+    });
+    if (error) { toast.error("Failed to save lead"); return; }
+    setSavedNames((prev) => new Set(prev).add(hoa.filing_entity_name || ""));
+    toast.success("Lead saved");
+  };
+
+  const nonCompliantCount = results.filter(
+    (h) => !h.website_address || h.website_address.trim() === ""
+  ).length;
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-card">
+        <div className="container max-w-5xl py-6">
+          <div className="flex items-center gap-3 mb-1">
+            <Scale className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              TX HOA Compliance Auditor
+            </h1>
+          </div>
+          <p className="text-sm text-muted-foreground max-w-xl">
+            Search Texas HOAs, flag non-compliant entities per{" "}
+            <span className="font-medium text-foreground">TX Property Code §207.006</span> &{" "}
+            <span className="font-medium text-foreground">SB 711</span>, and track outreach leads.
+          </p>
+        </div>
+      </header>
+
+      <main className="container max-w-5xl py-8">
+        {/* Tabs */}
+        <div className="flex gap-1 mb-6 border-b border-border">
+          <button
+            onClick={() => setTab("search")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+              tab === "search"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Search className="h-3.5 w-3.5 inline mr-1.5 -mt-0.5" />
+            Search HOAs
+          </button>
+          <button
+            onClick={() => setTab("leads")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+              tab === "leads"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BookOpen className="h-3.5 w-3.5 inline mr-1.5 -mt-0.5" />
+            My Leads
+          </button>
+        </div>
+
+        {tab === "search" ? (
+          <>
+            {/* Search Bar */}
+            <div className="flex gap-2 mb-6">
+              <Input
+                placeholder="Enter a Texas city (e.g. Houston, Austin)…"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && search()}
+                className="max-w-sm"
+              />
+              <Button onClick={search} disabled={loading}>
+                {loading ? "Searching…" : "Search"}
+              </Button>
+            </div>
+
+            {/* Stats */}
+            {results.length > 0 && (
+              <p className="text-xs text-muted-foreground mb-4">
+                {results.length} results · <span className="text-destructive font-medium">{nonCompliantCount} non-compliant</span>
+              </p>
+            )}
+
+            {/* Results Grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {results.map((hoa, i) => (
+                <HOACard
+                  key={`${hoa.filing_entity_name}-${i}`}
+                  hoa={hoa}
+                  index={i}
+                  onSaveLead={saveLead}
+                  onGenerateOutreach={(h) =>
+                    setOutreach({
+                      name: h.filing_entity_name || "HOA",
+                      email: h.management_company_email || "",
+                    })
+                  }
+                  isSaved={savedNames.has(hoa.filing_entity_name || "")}
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <LeadsView />
+        )}
+      </main>
+
+      {outreach && (
+        <OutreachModal
+          open={!!outreach}
+          onOpenChange={(o) => !o && setOutreach(null)}
+          hoaName={outreach.name}
+          email={outreach.email}
+        />
+      )}
     </div>
   );
-};
-
-const Index = PlaceholderIndex;
-
-export default Index;
+}
