@@ -125,6 +125,19 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
     howTo.push("• Submit and retain the confirmation number for your records");
   }
 
+  if (!hasWebsite) {
+    steps.push(`${steps.length + 1}. Publish a community website with governing documents, meeting notices, and contact info per TX Property Code §207.006.`);
+
+    howTo.push("");
+    howTo.push("HOW TO CREATE A COMPLIANT HOA WEBSITE:");
+    howTo.push("• §207.006 and SB 711 require HOAs to maintain a publicly accessible website");
+    howTo.push("• The website must include: dedicatory instruments (CC&Rs), bylaws, rules, current budget, most recent financial audit, and insurance certificates");
+    howTo.push("• Post meeting notices at least 72 hours before any board meeting");
+    howTo.push("• Include a contact form or email for homeowner inquiries");
+    howTo.push("• Many providers offer HOA-specific website hosting (e.g., HOA Express, AppFolio, or a custom-built site)");
+    howTo.push("• Once live, update the TREC filing with the website URL");
+  }
+
   if (!hoa.management_company_email) {
     steps.push(`${steps.length + 1}. Add a valid management company email to the TREC filing for SB 711 compliance.`);
 
