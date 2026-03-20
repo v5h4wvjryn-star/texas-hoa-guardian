@@ -1,0 +1,1 @@
+ALTER TABLE public.hoa_leads ADD COLUMN compliance_howto text;
