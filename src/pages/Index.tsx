@@ -60,7 +60,7 @@ export default function Index() {
   };
 
   const nonCompliantCount = results.filter(
-    (h) => !h.website_address || h.website_address.trim() === ""
+    (h) => !h.certificate?.url || h.certificate.url.trim() === ""
   ).length;
 
   return (
