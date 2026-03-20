@@ -41,16 +41,23 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
   const hasCert = certUrl.length > 0;
   const name = hoa.name || "";
   const filingYear = hasCert ? extractYearFromUrl(certUrl) : null;
+  const hasWebsite = !!hoa.website_address?.trim();
+  const hasEmail = !!hoa.management_company_email?.trim();
 
-  // --- Risk Level ---
+  // --- Risk Level (worst issue wins) ---
   let riskLevel: RiskLevel;
   let riskLabel: string;
   let riskDescription: string;
 
-  if (!hasCert) {
+  const issues: string[] = [];
+  if (!hasCert) issues.push("no TREC certificate");
+  if (!hasWebsite) issues.push("no website (§207.006)");
+  if (!hasEmail) issues.push("no contact email (SB 711)");
+
+  if (!hasCert || (!hasWebsite && !hasEmail)) {
     riskLevel = "high";
     riskLabel = "High Risk";
-    riskDescription = "No certificate on file — potential §207.006 violation";
+    riskDescription = issues.join(", ").replace(/^./, (c) => c.toUpperCase());
   } else if (isSelfManaged(name)) {
     riskLevel = "opportunity";
     riskLabel = "Opportunity";
@@ -59,10 +66,14 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
     riskLevel = "medium";
     riskLabel = "Medium Risk";
     riskDescription = `Certificate dated ${filingYear} — may need renewal`;
+  } else if (!hasWebsite || !hasEmail) {
+    riskLevel = "medium";
+    riskLabel = "Medium Risk";
+    riskDescription = issues.join(", ").replace(/^./, (c) => c.toUpperCase());
   } else {
     riskLevel = "compliant";
     riskLabel = "Compliant";
-    riskDescription = "Certificate on file and appears current";
+    riskDescription = "Certificate, website, and email all on file";
   }
 
   // --- Legality Check ---
@@ -112,6 +123,19 @@ export function scoreCompliance(hoa: HOAData): ComplianceResult {
     howTo.push("• Upload any new or amended governing documents (bylaws, declarations)");
     howTo.push("• Confirm the registered agent information is current with the Secretary of State");
     howTo.push("• Submit and retain the confirmation number for your records");
+  }
+
+  if (!hasWebsite) {
+    steps.push(`${steps.length + 1}. Publish a community website with governing documents, meeting notices, and contact info per TX Property Code §207.006.`);
+
+    howTo.push("");
+    howTo.push("HOW TO CREATE A COMPLIANT HOA WEBSITE:");
+    howTo.push("• §207.006 and SB 711 require HOAs to maintain a publicly accessible website");
+    howTo.push("• The website must include: dedicatory instruments (CC&Rs), bylaws, rules, current budget, most recent financial audit, and insurance certificates");
+    howTo.push("• Post meeting notices at least 72 hours before any board meeting");
+    howTo.push("• Include a contact form or email for homeowner inquiries");
+    howTo.push("• Many providers offer HOA-specific website hosting (e.g., HOA Express, AppFolio, or a custom-built site)");
+    howTo.push("• Once live, update the TREC filing with the website URL");
   }
 
   if (!hoa.management_company_email) {

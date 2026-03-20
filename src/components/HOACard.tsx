@@ -1,4 +1,4 @@
-import { Mail, Save, Building2, AlertTriangle, CheckCircle, Clock, Target } from "lucide-react";
+import { Mail, Save, Building2, AlertTriangle, CheckCircle, Clock, Target, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { HOAData } from "@/pages/Index";
 import { scoreCompliance, type RiskLevel } from "@/lib/compliance";
@@ -73,6 +73,23 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
         <p><span className="font-medium text-card-foreground">City:</span> {hoa.city || "N/A"}</p>
         <p><span className="font-medium text-card-foreground">ZIP:</span> {hoa.zip || "N/A"}</p>
         <p><span className="font-medium text-card-foreground">Type:</span> {hoa.type || "N/A"}</p>
+        <p className="flex items-center gap-1">
+          <Globe className="h-3 w-3 shrink-0" />
+          <span className="font-medium text-card-foreground">Website:</span>{" "}
+          {hoa.website_address ? (
+            <a href={hoa.website_address.startsWith("http") ? hoa.website_address : `https://${hoa.website_address}`} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 truncate">
+              {hoa.website_address}
+            </a>
+          ) : (
+            <span className="text-destructive font-medium">Missing — §207.006</span>
+          )}
+        </p>
+        {hoa.management_company_name && (
+          <p><span className="font-medium text-card-foreground">Mgmt Co:</span> {hoa.management_company_name}</p>
+        )}
+        {hoa.management_company_email && (
+          <p><span className="font-medium text-card-foreground">Email:</span> {hoa.management_company_email}</p>
+        )}
         {hasCertificate && (
           <a href={hoa.certificate!.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline underline-offset-2">
             View Certificate
