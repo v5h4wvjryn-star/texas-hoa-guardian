@@ -185,7 +185,11 @@ export default function Index() {
             </div>
           </>
         ) : (
-          <LeadsView />
+          <LeadsView onLeadDeleted={(name) => setSavedNames((prev) => {
+            const next = new Set(prev);
+            next.delete(name);
+            return next;
+          })} />
         )}
       </main>
 
