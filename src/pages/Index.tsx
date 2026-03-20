@@ -136,17 +136,17 @@ export default function Index() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((hoa, i) => (
                 <HOACard
-                  key={`${hoa.filing_entity_name}-${i}`}
+                  key={`${hoa.name}-${i}`}
                   hoa={hoa}
                   index={i}
                   onSaveLead={saveLead}
                   onGenerateOutreach={(h) =>
                     setOutreach({
-                      name: h.filing_entity_name || "HOA",
+                      name: h.name || "HOA",
                       email: h.management_company_email || "",
                     })
                   }
-                  isSaved={savedNames.has(hoa.filing_entity_name || "")}
+                  isSaved={savedNames.has(hoa.name || "")}
                 />
               ))}
             </div>
