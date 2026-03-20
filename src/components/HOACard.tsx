@@ -1,13 +1,6 @@
 import { AlertTriangle, CheckCircle, Mail, Save, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface HOAData {
-  filing_entity_name?: string;
-  management_company_name?: string;
-  management_company_email?: string;
-  website_address?: string;
-  city?: string;
-}
+import type { HOAData } from "@/pages/Index";
 
 interface HOACardProps {
   hoa: HOAData;
@@ -18,7 +11,8 @@ interface HOACardProps {
 }
 
 export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, index }: HOACardProps) {
-  const isNonCompliant = !hoa.website_address || hoa.website_address.trim() === "";
+  const hasCertificate = !!hoa.certificate?.url && hoa.certificate.url.trim() !== "";
+  const isNonCompliant = !hasCertificate;
 
   return (
     <div
@@ -29,7 +23,7 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
         <div className="flex items-center gap-2 min-w-0">
           <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
           <h3 className="font-semibold text-card-foreground truncate text-sm">
-            {hoa.filing_entity_name || "Unknown HOA"}
+            {hoa.name || "Unknown HOA"}
           </h3>
         </div>
         {isNonCompliant ? (
@@ -46,12 +40,18 @@ export default function HOACard({ hoa, onSaveLead, onGenerateOutreach, isSaved, 
       </div>
 
       <div className="space-y-1.5 text-sm text-muted-foreground mb-4">
-        <p><span className="font-medium text-card-foreground">Mgmt Co:</span> {hoa.management_company_name || "N/A"}</p>
-        <p><span className="font-medium text-card-foreground">Email:</span> {hoa.management_company_email || "N/A"}</p>
+        <p><span className="font-medium text-card-foreground">County:</span> {hoa.county || "N/A"}</p>
         <p><span className="font-medium text-card-foreground">City:</span> {hoa.city || "N/A"}</p>
+        <p><span className="font-medium text-card-foreground">ZIP:</span> {hoa.zip || "N/A"}</p>
+        <p><span className="font-medium text-card-foreground">Type:</span> {hoa.type || "N/A"}</p>
+        {hasCertificate && (
+          <a href={hoa.certificate!.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline underline-offset-2">
+            View Certificate
+          </a>
+        )}
         {isNonCompliant && (
           <p className="text-xs text-destructive mt-2">
-            ⚠ Missing website — potential violation of TX Property Code §207.006 / SB 711
+            ⚠ Missing certificate — potential violation of TX Property Code §207.006 / SB 711
           </p>
         )}
       </div>

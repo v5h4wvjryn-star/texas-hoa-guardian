@@ -10,12 +10,16 @@ import LeadsView from "@/components/LeadsView";
 
 const API_URL = "https://data.texas.gov/resource/8auc-hzdi.json";
 
-interface HOAData {
-  filing_entity_name?: string;
+export interface HOAData {
+  name?: string;
+  county?: string;
+  city?: string;
+  zip?: string;
+  type?: string;
+  certificate?: { url?: string };
   management_company_name?: string;
   management_company_email?: string;
   website_address?: string;
-  city?: string;
 }
 
 type Tab = "search" | "leads";
@@ -45,18 +49,18 @@ export default function Index() {
 
   const saveLead = async (hoa: HOAData) => {
     const { error } = await supabase.from("hoa_leads").insert({
-      hoa_name: hoa.filing_entity_name || null,
+      hoa_name: hoa.name || null,
       mgmt_company: hoa.management_company_name || null,
       contact_email: hoa.management_company_email || null,
       city: hoa.city || null,
     });
     if (error) { toast.error("Failed to save lead"); return; }
-    setSavedNames((prev) => new Set(prev).add(hoa.filing_entity_name || ""));
+    setSavedNames((prev) => new Set(prev).add(hoa.name || ""));
     toast.success("Lead saved");
   };
 
   const nonCompliantCount = results.filter(
-    (h) => !h.website_address || h.website_address.trim() === ""
+    (h) => !h.certificate?.url || h.certificate.url.trim() === ""
   ).length;
 
   return (
@@ -132,17 +136,17 @@ export default function Index() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((hoa, i) => (
                 <HOACard
-                  key={`${hoa.filing_entity_name}-${i}`}
+                  key={`${hoa.name}-${i}`}
                   hoa={hoa}
                   index={i}
                   onSaveLead={saveLead}
                   onGenerateOutreach={(h) =>
                     setOutreach({
-                      name: h.filing_entity_name || "HOA",
+                      name: h.name || "HOA",
                       email: h.management_company_email || "",
                     })
                   }
-                  isSaved={savedNames.has(hoa.filing_entity_name || "")}
+                  isSaved={savedNames.has(hoa.name || "")}
                 />
               ))}
             </div>
